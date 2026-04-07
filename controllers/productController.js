@@ -1,5 +1,8 @@
 const Product = require("../models/productModel");
 
+const fetch = (...args) =>
+    import("node-fetch").then(({ default: fetch }) => fetch(...args));
+
 // Creating products
 exports.createProduct = async (req, res) => {
     try {
@@ -53,7 +56,7 @@ exports.updateProduct = async (req, res) => {
         );
 
         if (!updatedProduct) {
-            return res.status(404).json({ message: "Product cannot found" });
+            return res.status(404).json({ message: "Product not found" });
         }
 
         res.json(updatedProduct);
@@ -79,13 +82,11 @@ exports.deleteProduct = async (req, res) => {
     }
 };
 
-//  Getting all group products
+// Getting all group products
 exports.getAllGroupProducts = async (req, res) => {
     try {
-        // nadire products
         const nadireProducts = await Product.find();
 
-        // deployed links
         const joeUrl = "";
         const hamzahUrl = "";
 
@@ -93,16 +94,18 @@ exports.getAllGroupProducts = async (req, res) => {
         let hamzahProducts = [];
 
         // Joe products
-        try {
-            const joeResponse = await fetch(JoeUrl);
+        if (joeUrl) {
+            try {
+                const joeResponse = await fetch(joeUrl);
 
-            if (!joeResponse.ok) {
-                console.log(`Error Joe API: ${joeResponse.status}`);
-            } else {
-                joeProducts = await joeResponse.json();
+                if (!joeResponse.ok) {
+                    console.log(`Error Joe API: ${joeResponse.status}`);
+                } else {
+                    joeProducts = await joeResponse.json();
+                }
+            } catch (error) {
+                console.log("Error loading Joe's products:", error.message);
             }
-        } catch (error) {
-            console.log("Error loading Joe's products:", error.message);
         }
 
         // Hamzah products
@@ -112,10 +115,10 @@ exports.getAllGroupProducts = async (req, res) => {
             if (!hamzahResponse.ok) {
                 console.log(`Error Hamzah API: ${hamzahResponse.status}`);
             } else {
-                aliProducts = await aliResponse.json();
+                hamzahProducts = await hamzahResponse.json();
             }
         } catch (error) {
-            console.log("Error loading Ali's products:", error.message);
+            console.log("Error loading Hamzah's products:", error.message);
         }
 
         const allProducts = [
