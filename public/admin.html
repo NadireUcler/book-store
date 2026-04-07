@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Store Admin Panel</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="admin-header">
+      <h1>⚙️ Book Store Admin Panel</h1>
+      <p>Manage your products from this private control page.</p>
+    </div>
+
+    <div class="admin-grid">
+      <div class="section-box">
+        <h2>Add New Product</h2>
+
+        <form id="createForm" class="admin-form">
+          <label for="storeId">Store ID</label>
+          <input type="number" id="storeId" placeholder="Enter store ID" required />
+
+          <label for="storeName">Store Name</label>
+          <input type="text" id="storeName" placeholder="Enter store name" required />
+
+          <label for="productId">Product ID</label>
+          <input type="number" id="productId" placeholder="Enter product ID" required />
+
+          <label for="productName">Product Name</label>
+          <input type="text" id="productName" placeholder="Enter product name" required />
+
+          <label for="price">Price</label>
+          <input type="number" id="price" placeholder="Enter product price" required />
+
+          <button type="submit" class="action-button admin-save-button">Add Product</button>
+        </form>
+      </div>
+
+      <div class="section-box">
+        <h2>Delete Product</h2>
+
+        <div class="admin-form">
+          <label for="deleteId">Product ID</label>
+          <input type="number" id="deleteId" placeholder="Enter product ID to delete" />
+          <button type="button" class="action-button danger-button admin-delete-button" onclick="deleteProduct()">
+            Delete Product
+          </button>
+        </div>
+      </div>
+
+      <div class="section-box">
+        <h2>Get All Products</h2>
+        <button type="button" class="action-button secondary-button admin-full-button" onclick="getAllProducts()">
+          Show All Products
+        </button>
+      </div>
+
+      <div class="section-box">
+        <h2>Find Product by ID</h2>
+
+        <div class="admin-form">
+          <label for="searchId">Product ID</label>
+          <input type="number" id="searchId" placeholder="Enter product ID to search" />
+          <button type="button" class="action-button secondary-button admin-full-button" onclick="getProductById()">
+            Find Product
+          </button>
+        </div>
+      </div>
+
+      <div class="section-box">
+        <h2>Server Response</h2>
+        <pre id="output" class="response-box">No response yet.</pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const output = document.getElementById("output");
+
+    // display returned data in the response panel
+    function showResponse(data) {
+      output.textContent = JSON.stringify(data, null, 2);
+    }
+
+    // create a new product
+    document.getElementById("createForm").addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      const productData = {
+        storeId: Number(document.getElementById("storeId").value),
+        storeName: document.getElementById("storeName").value,
+        productId: Number(document.getElementById("productId").value),
+        productName: document.getElementById("productName").value,
+        price: Number(document.getElementById("price").value)
+      };
+
+      try {
+        const response = await fetch("/products", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(productData)
+        });
+
+        const result = await response.json();
+        showResponse(result);
+      } catch (error) {
+        showResponse({ message: "Error adding product", error: error.message });
+      }
+    });
+
+    // delete a product by id
+    async function deleteProduct() {
+      const id = document.getElementById("deleteId").value;
+
+      if (!id) {
+        showResponse({ message: "Please enter a product ID." });
+        return;
+      }
+
+      try {
+        const response = await fetch(`/products/${id}`, {
+          method: "DELETE"
+        });
+
+        const result = await response.json();
+        showResponse(result);
+      } catch (error) {
+        showResponse({ message: "Error deleting product", error: error.message });
+      }
+    }
+
+    // get all products
+    async function getAllProducts() {
+      try {
+        const response = await fetch("/products");
+        const result = await response.json();
+        showResponse(result);
+      } catch (error) {
+        showResponse({ message: "Error loading products", error: error.message });
+      }
+    }
+
+    // get one product by id
+    async function getProductById() {
+      const id = document.getElementById("searchId").value;
+
+      if (!id) {
+        showResponse({ message: "Please enter a product ID." });
+        return;
+      }
+
+      try {
+        const response = await fetch(`/products/${id}`);
+        const result = await response.json();
+        showResponse(result);
+      } catch (error) {
+        showResponse({ message: "Error finding product", error: error.message });
+      }
+    }
+  </script>
+</body>
+</html>
