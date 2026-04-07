@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Group 3 Store Hub</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="hero">
+      <h1>Group 3 Store Hub</h1>
+      <p>Combined product display and API testing area for Nadire's Store, Joe's Store, and Hamzah's Store.</p>
+      <div class="hero-actions">
+        <button class="main-button" onclick="loadGroupStores()">Show Group 3 Products</button>
+      </div>
+    </div>
+
+    <div class="layout-grid">
+      <div class="left-panel">
+        <div class="section-box">
+          <h2>Store Showcase</h2>
+
+          <div class="stores-stack">
+            <div class="store-panel nadire-store">
+              <h3>🛍️ Nadire's Store</h3>
+              <ul id="nadireList">
+                <li>No items available yet.</li>
+              </ul>
+            </div>
+
+            <div class="store-panel joe-store">
+              <h3>🖥️ Joe's Store</h3>
+              <ul id="joeList">
+                <li>No items available yet.</li>
+              </ul>
+            </div>
+
+            <div class="store-panel hamzah-store">
+              <h3>📦 Hamzah's Store</h3>
+              <ul id="hamzahList">
+                <li>No items available yet.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <div class="section-box">
+          <h2>Product Control Center</h2>
+
+          <div class="form-block">
+            <h3>Add New Product</h3>
+            <form id="createForm">
+              <label for="storeId">Store ID</label>
+              <input type="number" id="storeId" required>
+
+              <label for="storeName">Store Name</label>
+              <input type="text" id="storeName" required>
+
+              <label for="productId">Product ID</label>
+              <input type="number" id="productId" required>
+
+              <label for="productName">Product Name</label>
+              <input type="text" id="productName" required>
+
+              <label for="price">Price</label>
+              <input type="number" id="price" required>
+
+              <button type="submit" class="action-button">Save Product</button>
+            </form>
+          </div>
+
+          <div class="mini-block">
+            <h3>View All Products</h3>
+            <button class="action-button secondary-button" onclick="getAll()">Get All Products</button>
+          </div>
+
+          <div class="mini-block">
+            <h3>Search Product by ID</h3>
+            <input type="number" id="getId" placeholder="Enter product ID">
+            <button class="action-button secondary-button" onclick="getOne()">Get Product</button>
+          </div>
+
+          <div class="mini-block">
+            <h3>Remove Product</h3>
+            <input type="number" id="deleteId" placeholder="Enter product ID">
+            <button class="action-button danger-button" onclick="deleteProduct()">Delete Product</button>
+          </div>
+        </div>
+
+        <div class="section-box">
+          <h2>Server Response</h2>
+          <pre id="output" class="response-box">{}</pre>
+          <div class="footer-note">Live API results will appear here.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const output = document.getElementById("output");
+
+    // show returned JSON data in the response area
+    function displayResult(data) {
+      output.textContent = JSON.stringify(data, null, 2);
+    }
+
+    // update the product list for a selected store section
+    function fillStoreList(listId, items) {
+      const targetList = document.getElementById(listId);
+      targetList.innerHTML = "";
+
+      if (!items || items.length === 0) {
+        targetList.innerHTML = "<li>No products found.</li>";
+        return;
+      }
+
+      items.forEach(item => {
+        const row = document.createElement("li");
+        row.textContent = `${item.productName} | $${item.price}`;
+        targetList.appendChild(row);
+      });
+    }
+
+    // load all products and separate them based on store name
+    async function loadGroupStores() {
+      try {
+        const response = await fetch("/all-products");
+        const allProducts = await response.json();
+
+        const nadireProducts = allProducts.filter(product =>
+          product.storeName &&
+          product.storeName.toLowerCase().includes("nadire")
+        );
+
+        const joeProducts = allProducts.filter(product =>
+          product.storeName &&
+          product.storeName.toLowerCase().includes("joe")
+        );
+
+        const hamzahProducts = allProducts.filter(product =>
+          product.storeName &&
+          product.storeName.toLowerCase().includes("hamzah")
+        );
+
+        fillStoreList("nadireList", nadireProducts);
+        fillStoreList("joeList", joeProducts);
+        fillStoreList("hamzahList", hamzahProducts);
+      } catch (error) {
+        console.log("Store data could not be loaded:", error.message);
+
+        fillStoreList("nadireList", []);
+        fillStoreList("joeList", []);
+        fillStoreList("hamzahList", []);
+      }
+    }
+
+    // submit a new product to the backend
+    document.getElementById("createForm").addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      const productData = {
+        storeId: Number(document.getElementById("storeId").value),
+        storeName: document.getElementById("storeName").value,
+        productId: Number(document.getElementById("productId").value),
+        productName: document.getElementById("productName").value,
+        price: Number(document.getElementById("price").value)
+      };
+
+      const response = await fetch("/products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(productData)
+      });
+
+      const result = await response.json();
+      displayResult(result);
+      loadGroupStores();
+    });
+
+    // get every product from the API
+    async function getAll() {
+      const response = await fetch("/products");
+      const data = await response.json();
+      displayResult(data);
+    }
+
+    // get one specific product by id
+    async function getOne() {
+      const id = document.getElementById("getId").value;
+      const response = await fetch(`/products/${id}`);
+      const data = await response.json();
+      displayResult(data);
+    }
+
+    // delete one product by id
+    async function deleteProduct() {
+      const id = document.getElementById("deleteId").value;
+      const response = await fetch(`/products/${id}`, {
+        method: "DELETE"
+      });
+      const data = await response.json();
+      displayResult(data);
+      loadGroupStores();
+    }
+
+    // automatically load store items when the page opens
+    loadGroupStores();
+  </script>
+</body>
+</html>
