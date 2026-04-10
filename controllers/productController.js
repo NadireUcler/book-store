@@ -87,7 +87,7 @@ exports.getAllGroupProducts = async (req, res) => {
     try {
         const nadireProducts = await Product.find();
 
-        const joeUrl = "";
+        const joeUrl = "https://joes-store-module.onrender.com/products";
         const hamzahUrl = "";
 
         let joeProducts = [];

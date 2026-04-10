@@ -1,21 +1,16 @@
-const request = require("supertest");
-const mongoose = require("mongoose");
-const app = require("../app");
+const supertest = require("supertest");
 
-// testing GET /products endpoint
-describe("GET /products", () => {
-    test("should return all products with status 200", async () => {
-        const response = await request(app).get("/products");
+describe("Products API - GET", () => {
 
-        expect(response.statusCode).toBe(200);
-        expect(Array.isArray(response.body)).toBe(true);
+    it("should return product list successfully", async () => {
 
-        
-        console.log("nadireozel@gmail.com - getAll to show all product - 200 - PASSED");
-    });
-});
+        const api = supertest("https://book-store-9yxy.onrender.com");
 
+        const res = await api.get("/products");
 
-afterAll(async () => {
-    await mongoose.connection.close();
+        expect(res.status).toBe(200);
+        expect(res.body).toBeInstanceOf(Array);
+
+    }, 20000);
+
 });

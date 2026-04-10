@@ -1,23 +1,29 @@
-// tool used to execute shell commands inside Node.js
-const { execSync } = require("child_process");
+// running each test file and print result status
 
-// helper function to trigger a specific test file
-function executeTest(testLabel, testFile) {
+const { execSync: runCommand } = require("child_process");
+
+// test list 
+const testSuite = [
+    { path: "tests/nadire.test.js", user: "nadireozel@gmail.com" },
+    { path: "tests/joe.test.js", user: "joe@example.com" },
+    { path: "tests/hamzah.test.js", user: "hamzah@example.com" }
+];
+
+// function to execute a single test
+const executeTest = (testObj) => {
     try {
-        console.log(`\nStarting ${testLabel} test...\n`);
-
-        // run jest for the selected test file in sequence
-        execSync(`npx jest ${testFile} --runInBand --silent`, {
-            stdio: "inherit"
+       
+        runCommand(`npx jest ${testObj.path} --runInBand --silent`, {
+            stdio: "pipe"
         });
 
-        console.log(`\n${testLabel} test finished without errors.\n`);
+        
+        console.log(`${testObj.user} - getAll to show all product - 200 - PASSED`);
     } catch (err) {
-        console.log(`\n${testLabel} test encountered an issue.\n`);
+      
+        console.log(`${testObj.user} - getAll to show all product - 200 - FAILED`);
     }
-}
+};
 
-// execute all group member tests one by one
-executeTest("Nadire", "tests/nadire.test.js");
-executeTest("Joe", "tests/joe.test.js");
-executeTest("Hamzah", "tests/hamzah.test.js");
+// loop through all tests
+testSuite.forEach((t) => executeTest(t));
