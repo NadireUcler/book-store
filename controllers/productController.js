@@ -88,10 +88,8 @@ exports.getAllGroupProducts = async (req, res) => {
         const nadireProducts = await Product.find();
 
         const joeUrl = "https://joes-store-module.onrender.com/products";
-        const hamzahUrl = "";
 
         let joeProducts = [];
-        let hamzahProducts = [];
 
         // Joe products
         if (joeUrl) {
@@ -108,23 +106,9 @@ exports.getAllGroupProducts = async (req, res) => {
             }
         }
 
-        // Hamzah products
-        try {
-            const hamzahResponse = await fetch(hamzahUrl);
-
-            if (!hamzahResponse.ok) {
-                console.log(`Error Hamzah API: ${hamzahResponse.status}`);
-            } else {
-                hamzahProducts = await hamzahResponse.json();
-            }
-        } catch (error) {
-            console.log("Error loading Hamzah's products:", error.message);
-        }
-
         const allProducts = [
             ...nadireProducts,
-            ...joeProducts,
-            ...hamzahProducts
+            ...joeProducts
         ];
 
         res.status(200).json(allProducts);

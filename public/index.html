@@ -8,58 +8,131 @@
 </head>
 <body>
 
-<div class="page-wrapper">
-  <div class="hero">
-    <h1>Group 3 Store Hub</h1>
-    <p>View products from Nadire, Joe, and Hamzah stores</p>
+<div class="store-page">
 
-    <div class="hero-actions">
-      <button class="main-button" onclick="loadGroupStores()">Load Products</button>
+  <div class="page-wrapper">
+
+    <div class="hero">
+      <h1>Group 3 Store Hub</h1>
+      <p>View products from Nadire's Book Store and Joe's Store</p>
+
+      <div class="hero-actions">
+        <button class="main-button" onclick="loadGroupStores()">Load Products</button>
+      </div>
     </div>
+
+    <div class="section-box">
+      <h2>Store Products</h2>
+
+      <div class="stores-stack">
+
+        <!-- NADIRE -->
+        <div class="store-panel nadire-store">
+          <h3>Nadire's Book Store</h3>
+
+          <table class="store-table">
+            <thead>
+              <tr>
+                <th>Product ID</th>
+                <th>Product Name</th>
+                <th>Price ($)</th>
+              </tr>
+            </thead>
+            <tbody id="nadireList">
+              <tr>
+                <td colspan="3">No products</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- JOE -->
+        <div class="store-panel joe-store">
+          <h3>Joe's Store</h3>
+
+          <table class="store-table">
+            <thead>
+              <tr>
+                <th>Product ID</th>
+                <th>Product Name</th>
+                <th>Price ($)</th>
+              </tr>
+            </thead>
+            <tbody id="joeList">
+              <tr>
+                <td colspan="3">No products</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <p class="footer-note">
+        This application is student work for demonstration of web development skills only.
+      </p>
+    </div>
+
   </div>
 
-  <div class="stores-stack">
-    <div class="store-panel nadire-store">
-      <h3>🛍️ Nadire's Book Store</h3>
-      <ul id="nadireList"><li>No products</li></ul>
-    </div>
-
-    <div class="store-panel joe-store">
-      <h3>🖥️ Joe's Store</h3>
-      <ul id="joeList"><li>No products</li></ul>
-    </div>
-
-    <div class="store-panel hamzah-store">
-      <h3>📦 Hamzah's Store</h3>
-      <ul id="hamzahList"><li>No products</li></ul>
-    </div>
-  </div>
 </div>
 
 <script>
-function fillStoreList(id, data) {
-  const list = document.getElementById(id);
-  list.innerHTML = "";
+// CAD format but shows $
+function formatPrice(price) {
+  if (price == null || isNaN(price)) return "-";
+
+  return new Intl.NumberFormat("en-CA", {
+    style: "currency",
+    currency: "CAD",
+    currencyDisplay: "symbol"
+  }).format(price);
+}
+
+function fillStoreTable(id, data) {
+  const tableBody = document.getElementById(id);
+  tableBody.innerHTML = "";
 
   if (!data.length) {
-    list.innerHTML = "<li>No products found</li>";
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="3">No products found</td>
+      </tr>
+    `;
     return;
   }
 
-  data.forEach(p => {
-    const li = document.createElement("li");
-    li.textContent = `${p.productName} - $${p.price}`;
-    list.appendChild(li);
+  data.forEach((product) => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${product.productId ?? "-"}</td>
+      <td>${product.productName ?? "-"}</td>
+      <td>${formatPrice(product.price)}</td>
+    `;
+
+    tableBody.appendChild(row);
   });
 }
 
 async function loadGroupStores() {
-  const res = await fetch("/all-products");
-  const data = await res.json();
+  try {
+    const response = await fetch("/all-products");
+    const products = await response.json();
 
-  fillStoreList("nadireList", data.filter(p => p.storeId === 2));
-  fillStoreList("joeList", data.filter(p => p.storeId === 1));
-  fillStoreList("hamzahList", data.filter(p => p.storeId === 3));
+    const nadireProducts = products.filter(p => p.storeId === 2);
+    const joeProducts = products.filter(p => p.storeId === 1);
+
+    fillStoreTable("nadireList", nadireProducts);
+    fillStoreTable("joeList", joeProducts);
+
+  } catch (error) {
+    document.getElementById("nadireList").innerHTML =
+      "<tr><td colspan='3'>Error loading products</td></tr>";
+
+    document.getElementById("joeList").innerHTML =
+      "<tr><td colspan='3'>Error loading products</td></tr>";
+  }
 }
 
 loadGroupStores();
