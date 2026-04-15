@@ -2,8 +2,32 @@
 
 # Book Store API – Group 3
 
-This project is a Node.js and Express-based REST API developed to manage book products. It supports full CRUD operations including creating, retrieving, updating, and deleting products, with data stored in MongoDB Atlas. The application also includes an integration endpoint (GET /all-products) that collects and combines product data from different store services, demonstrating a simple microservices-style communication between independent modules.
 
-A lightweight frontend interface is provided to display products from all stores in a unified Group 3 Store Hub, while also allowing users to interact with and test the API directly. Testing is implemented using Jest and Supertest to verify that endpoints return correct responses, and an automate.js script is used to run all test files sequentially for clear and organized output in the terminal.
+This project is a Node.js and Express-based web application developed as part of a team assignment. The objective was to create an e-commerce store module using MongoDB Atlas and integrate multiple team modules into a single system.
 
-The project can be run locally by installing dependencies with npm install, setting up environment variables in a .env file, and starting the server using npm run dev. Tests can be executed using npm test or npm run automate. The application is deployed on Render and accessible online.
+Each team member developed their own store independently. In this project, I implemented a Book Store module, while another team member developed a Music Store module. The modules were later integrated using a shared endpoint.
+
+The application supports basic CRUD operations for products, including storing and retrieving data from MongoDB Atlas. Each store contains product data with the following fields: storeId, storeName, productId, productName, and price.
+
+An integration endpoint (/allproducts) was created to combine product data from multiple deployed APIs, simulating a simple microservices architecture.
+
+Live Deployment
+
+Book Store API (Render):
+https://book-store-9yxy.onrender.com/products
+
+Testing
+
+Testing was implemented using Supertest. The test verifies that the GET /products endpoint returns a status code of 200 and valid data. The output is formatted as required:
+
+your_email@example.com - getAll to show all product - 200 - PASSED
+
+An automate.js script was created to execute tests sequentially and display clear results in the terminal.
+
+How to Run
+Install dependencies:
+npm install
+Create a .env file with your MongoDB connection string:
+MONGO_URI=your_connection_string
+Run the application:
+npm start

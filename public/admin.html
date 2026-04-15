@@ -121,7 +121,7 @@
         showResponse({ message: "Error adding product", error: error.message });
       }
     });
-
+    //delete product
     async function deleteProduct() {
       const id = document.getElementById("deleteId").value;
 
@@ -141,7 +141,7 @@
         showResponse({ message: "Error deleting product", error: error.message });
       }
     }
-
+    //get all product
     async function getAllProducts() {
       try {
         const response = await fetch("/products");
@@ -151,7 +151,7 @@
         showResponse({ message: "Error loading products", error: error.message });
       }
     }
-
+    //get product by ID
     async function getProductById() {
       const id = document.getElementById("searchId").value;
 

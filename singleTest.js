@@ -11,5 +11,5 @@ try {
     console.log("nadireozel@gmail.com - getAll to show all product - 200 - PASSED");
 
 } catch (error) {
-    console.log("nadireozel@gmail.com - getAll to show all product - 200 - FAILED");
+    console.log("nadireozel@gmail.com - getAll to show all product - FAILED");
 }
